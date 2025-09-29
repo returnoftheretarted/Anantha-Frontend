@@ -1,0 +1,304 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Anantha - Professional Data Analysis Platform Design System
+Dark Navy Theme with extreme dark navy background and white text
+*/
+
+@layer base {
+  :root {
+    /* Core Brand Colors - Dark Navy Theme */
+    --background: 210 100% 5%; /* extreme dark navy */
+    --foreground: 0 0% 100%; /* white */
+
+    --card: 210 100% 10%; /* slightly lighter than background */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 210 100% 12%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%; /* White buttons */
+    --primary-foreground: 0 0% 0%; /* Black text */
+    --primary-hover: 0 0% 90%; /* Slightly darker white for hover */
+
+    --secondary: 210 100% 15%; /* secondary panels */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 210 100% 20%;
+
+    --muted: 210 100% 12%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 210 50% 25%; /* Deep Navy Accent */
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 210 50% 20%; /* darker on hover */
+
+    --destructive: 0 84% 60%; /* red */
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 43 100% 68%; /* yellow */
+    --warning-foreground: 0 0% 0%;
+
+    --success: 142 76% 50%; /* green */
+    --success-foreground: 0 0% 0%;
+
+    --border: 210 100% 20%;
+    --input: 210 100% 10%;
+    --ring: 195 100% 50%;
+
+    --radius: 0.5rem;
+
+    /* Chart Colors */
+    --chart-1: 210 100% 45%;
+    --chart-2: 174 100% 45%;
+    --chart-3: 271 100% 65%;
+    --chart-4: 43 100% 68%;
+    --chart-5: 332 100% 65%;
+    --chart-6: 142 76% 50%;
+    --chart-7: 25 100% 60%;
+    --chart-8: 210 40% 70%;
+
+    /* Flat gradients */
+    --gradient-primary: hsl(var(--primary));
+    --gradient-secondary: hsl(var(--secondary));
+    --gradient-accent: hsl(var(--accent));
+    --gradient-surface: hsl(var(--card));
+    --gradient-hero: hsl(var(--background));
+
+    /* Shadows & Effects */
+    --shadow-elegant: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-focus: 0 0 0 2px hsl(var(--primary) / 0.5);
+
+    /* Sidebar */
+    --sidebar-background: 210 100% 5%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 210 100% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 100% 15%;
+    --sidebar-ring: 0 0% 100%;
+
+    /* Typography Scale */
+    --font-heading: "DM Sans", system-ui, sans-serif;
+    --font-body: "DM Sans", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", Consolas, monospace;
+
+    /* Incognito Mode Colors - Dark Purple Theme */
+    --incognito-background: 270 100% 5%;
+    --incognito-card: 270 100% 8%;
+    --incognito-border: 270 100% 12%;
+    --incognito-accent: 270 50% 20%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+@layer components {
+  /* Flat backgrounds */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .gradient-surface {
+    background: var(--gradient-surface);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  /* Shadows */
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .transition-smooth {
+    transition: all 0.2s ease;
+  }
+
+  .chart-colors {
+    --color-1: hsl(var(--chart-1));
+    --color-2: hsl(var(--chart-2));
+    --color-3: hsl(var(--chart-3));
+    --color-4: hsl(var(--chart-4));
+    --color-5: hsl(var(--chart-5));
+    --color-6: hsl(var(--chart-6));
+    --color-7: hsl(var(--chart-7));
+    --color-8: hsl(var(--chart-8));
+  }
+
+  /* Glass effect */
+  .glass-effect {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .animate-in {
+    animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Incognito Mode Styles */
+.incognito-mode {
+  --background: var(--incognito-background);
+  --card: var(--incognito-card);
+  --border: var(--incognito-border);
+  --accent: var(--incognito-accent);
+  --secondary: 270 100% 12%;
+  --muted: 270 100% 10%;
+}
+
+.incognito-header {
+  border-bottom-color: hsl(var(--incognito-border));
+}
+
+.incognito-card {
+  border: none;
+  background: hsl(var(--incognito-card));
+}
+
+/* Alternative Brown Theme (uncomment to use instead of purple) */
+/*
+.incognito-mode {
+    --background: 25 100% 5%;
+    --card: 25 100% 8%;
+    --border: 25 100% 12%;
+    --accent: 25 50% 20%;
+    --secondary: 25 100% 12%;
+    --muted: 25 100% 10%;
+}
+*/
+
+/* Smooth transitions for theme switching */
+main {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom scrollbar for incognito mode */
+.incognito-mode ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.incognito-mode ::-webkit-scrollbar-track {
+  background: hsl(var(--incognito-card));
+}
+
+.incognito-mode ::-webkit-scrollbar-thumb {
+  background: hsl(var(--incognito-accent));
+  border-radius: 4px;
+}
+
+.incognito-mode ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--incognito-accent) / 0.8);
+}
+
+/* Glass effect for cards */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: hsl(var(--card) / 0.8);
+}
+
+/* Slider styling */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  cursor: pointer;
+  border: 2px solid hsl(var(--border));
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  cursor: pointer;
+  border: 2px solid hsl(var(--border));
+}
+
+/* Animation for loading spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  .incognito-mode {
+    --sidebar-width: 100%;
+  }
+}
+
+/* Focus styles for accessibility */
+.incognito-mode *:focus {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
+}
+
+/* Text selection styling */
+.incognito-mode ::selection {
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
+}
