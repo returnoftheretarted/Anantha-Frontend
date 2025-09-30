@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Anantha - Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['DM Sans', 'sans-serif'] },
+          colors: {
+            background: 'hsl(210, 100%, 5%)',
+            foreground: 'hsl(0, 0%, 100%)',
+            card: 'hsl(210, 100%, 10%)',
+            cardForeground: 'hsl(0, 0%, 100%)',
+            primary: { DEFAULT: 'hsl(0,0%,100%)', foreground: 'hsl(0,0%,0%)', hover: 'hsl(0,0%,90%)' },
+            secondary: { DEFAULT: 'hsl(210,100%,15%)', foreground: 'hsl(0,0%,100%)', hover: 'hsl(210,100%,20%)' },
+            accent: { DEFAULT: 'hsl(210,50%,25%)', foreground: 'hsl(0,0%,100%)', hover: 'hsl(210,50%,20%)' },
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-foreground font-sans min-h-screen flex items-center justify-center p-4">
+
+  <div class="flex flex-col md:flex-row w-full max-w-5xl bg-card rounded-none overflow-hidden shadow-card">
+    <!-- Left - Form -->
+    <div class="w-full md:w-1/2 p-8 md:p-10 lg:p-12">
+      <div class="max-w-sm mx-auto">
+        <div class="text-center md:text-left mb-8">
+          <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Anantha - Create Account
+          </h1>
+          <p class="text-cardForeground text-sm">Join our community by filling out the form below</p>
+        </div>
+
+        <form class="space-y-5">
+          <div>
+            <label for="signupName" class="block text-sm font-medium text-cardForeground mb-2">Full Name</label>
+            <input type="text" id="signupName" placeholder="John Doe"
+              class="w-full px-4 py-3 bg-card border border-secondary rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm">
+          </div>
+
+          <div>
+            <label for="signupAge" class="block text-sm font-medium text-cardForeground mb-2">Age</label>
+            <input type="number" id="signupAge" placeholder="18"
+              class="w-full px-4 py-3 bg-card border border-secondary rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm">
+          </div>
+
+          <div>
+            <label for="signupEmail" class="block text-sm font-medium text-cardForeground mb-2">Email Address</label>
+            <input type="email" id="signupEmail" placeholder="your@email.com"
+              class="w-full px-4 py-3 bg-card border border-secondary rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm">
+          </div>
+
+          <div>
+            <label for="signupPassword" class="block text-sm font-medium text-cardForeground mb-2">Password</label>
+            <input type="password" id="signupPassword" placeholder="••••••••"
+              class="w-full px-4 py-3 bg-card border border-secondary rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm">
+          </div>
+
+          <div class="pt-2">
+            <button type="submit"
+              class="w-full py-3 px-6 bg-primary text-primary-foreground font-medium rounded-lg transition-all duration-200 hover:bg-primary-hover">
+              Sign Up
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-muted-foreground">
+          Already have an account?
+          <a href="signin.html" class="font-medium text-primary hover:text-accent transition-colors">Sign in</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right - Illustration -->
+    <div class="hidden md:block md:w-1/2 bg-card relative">
+      <div class="absolute inset-0 flex items-center justify-center p-8">
+        <img src="sign-in-dark.svg" alt="Sign Up Illustration"
+          class="w-full h-auto max-h-[70vh] object-contain">
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

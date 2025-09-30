@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Core Brand Colors - Dark Navy Theme */
+    --background: 210 100% 5%; /* extreme dark navy */
+    --foreground: 0 0% 100%; /* white */
+
+    --card: 210 100% 10%; /* slightly lighter than background */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 210 100% 12%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%; /* White buttons */
+    --primary-foreground: 0 0% 0%; /* Black text */
+    --primary-hover: 0 0% 90%; /* Slightly darker white for hover */
+
+    --secondary: 210 100% 15%; /* secondary panels */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 210 100% 20%;
+
+    --muted: 210 100% 12%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 210 50% 25%; /* Deep Navy Accent */
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 210 50% 20%; /* darker on hover */
+
+    --destructive: 0 84% 60%; /* red */
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 43 100% 68%; /* yellow */
+    --warning-foreground: 0 0% 0%;
+
+    --success: 142 76% 50%; /* green */
+    --success-foreground: 0 0% 0%;
+
+    --border: 210 100% 20%;
+    --input: 210 100% 10%;
+    --ring: 195 100% 50%;
+
+    --radius: 0.5rem;
+
+    /* Chart Colors */
+    --chart-1: 210 100% 45%;
+    --chart-2: 174 100% 45%;
+    --chart-3: 271 100% 65%;
+    --chart-4: 43 100% 68%;
+    --chart-5: 332 100% 65%;
+    --chart-6: 142 76% 50%;
+    --chart-7: 25 100% 60%;
+    --chart-8: 210 40% 70%;
+
+    /* Flat gradients */
+    --gradient-primary: hsl(var(--primary));
+    --gradient-secondary: hsl(var(--secondary));
+    --gradient-accent: hsl(var(--accent));
+    --gradient-surface: hsl(var(--card));
+    --gradient-hero: hsl(var(--background));
+
+    /* Shadows & Effects */
+    --shadow-elegant: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-focus: 0 0 0 2px hsl(var(--primary) / 0.5);
+
+    /* Sidebar */
+    --sidebar-background: 210 100% 5%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 210 100% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 100% 15%;
+    --sidebar-ring: 0 0% 100%;
+
+    /* Typography Scale */
+    --font-heading: "DM Sans", system-ui, sans-serif;
+    --font-body: "DM Sans", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", Consolas, monospace;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
