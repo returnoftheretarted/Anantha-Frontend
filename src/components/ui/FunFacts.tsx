@@ -1,5 +1,7 @@
+"use client"
+
 // src/components/FunFacts.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 
 const funFacts = [
   "The Argo program is named after the ship Argo from Greek mythology — companion to Jason and the Argonauts.",
@@ -27,25 +29,25 @@ const funFacts = [
   "They drift at a depth called the “parking depth” (usually 1,000 m), then profile to 2,000 m.",
   "Argo data feeds directly into weather and climate models, improving monsoon and cyclone predictions.",
   "Fun twist: an Argo float once surfaced near a fisherman’s net, who thought he’d caught an alien robot!",
-];
+]
 
 export default function FunFacts() {
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % funFacts.length);
-    }, 5000); // rotate every 15s
-    return () => clearInterval(interval);
-  }, []);
+      setIndex((prev) => (prev + 1) % funFacts.length)
+    }, 5000) // rotate every 15s
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="relative bg-[hsl(210_100%_5%)] rounded-xl p-6 max-w-3xl mx-auto shadow-lg -mt-6">
-  <p className="text-lg sm:text-xl leading-relaxed text-blue-300 transition-opacity duration-700 ease-in-out pb-4">
-    <span className="text-white font-bold pr-2">Fun Fact:</span>
-    {funFacts[index]}
-  </p>
-</div>
-
-  );
+      <p className="text-lg sm:text-xl leading-relaxed text-blue-300 transition-opacity duration-700 ease-in-out pb-4">
+        <span className="text-white font-bold pr-2">Fun Fact:</span>
+        {funFacts[index]}
+      </p>
+    </div>
+  )
 }
+  
