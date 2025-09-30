@@ -139,7 +139,11 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
         method
       );
       
+<<<<<<< HEAD
       const url = new URL('http://localhost:8000/speech-to-text');
+=======
+      const url = new URL('https://anantha-kwml.onrender.com/speech-to-text');
+>>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
       url.searchParams.append('method', method);
       if (langCode && langCode !== 'en') {
         url.searchParams.append('language', langCode);
