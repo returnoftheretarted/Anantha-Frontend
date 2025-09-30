@@ -55,17 +55,10 @@ interface ChartConfig {
   hoverMode: "closest" | "x" | "y" | false
 }
 
-type Props = {
-  csvFile?: string
-  initialPlotType?: string
-}
-
-const DEFAULT_CSV = "https://anantha-kwml.onrender.com/static/plots/userId_chatId_uniqueId.csv"
-
-const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, initialPlotType = "line" }) => {
+const CSVVisualizationDashboard: React.FC = () => {
   const chartRef = useRef<HTMLDivElement>(null)
   const plotlyRef = useRef<any>(null)
-  const [plotType, setPlotType] = useState(initialPlotType)
+  const [plotType, setPlotType] = useState("line")
   const [csvData, setCsvData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -103,7 +96,7 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
       setLoading(true)
       setError(null)
 
-      const response = await fetch(csvFile)
+      const response = await fetch("https://anantha-kwml.onrender.com/static/plots/userId_chatId_uniqueId.csv")
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -277,6 +270,7 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
       scrollZoom: true,
     }
 
+    // Updated axis styling with light colors for dark theme
     const commonAxisStyle = {
       gridcolor: "rgba(255, 255, 255, 0.1)",
       zerolinecolor: "rgba(255, 255, 255, 0.3)",
@@ -290,7 +284,11 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
     const layout: any = {
       plot_bgcolor: "hsl(210, 100%, 5%)",
       paper_bgcolor: "hsl(210, 100%, 5%)",
-      font: { color: "rgba(255, 255, 255, 0.9)", family: "DM Sans, system-ui, sans-serif", size: 12 },
+      font: {
+        color: "rgba(255, 255, 255, 0.9)",
+        family: "DM Sans, system-ui, sans-serif",
+        size: 12,
+      },
       showlegend: config.showLegend,
       legend: {
         font: { color: "rgba(255, 255, 255, 0.9)", size: 11 },
@@ -303,52 +301,57 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
         borderwidth: 1,
       },
       margin: { l: 70, r: 50, t: 50, b: 60 },
-      transition: { duration: config.animationDuration, easing: "cubic-in-out" },
+      transition: {
+        duration: config.animationDuration,
+        easing: "cubic-in-out",
+      },
       hovermode: config.hoverMode,
     }
 
+    // Configure axes for all non-geographic chart types
     if (plotType !== "pie" && plotType !== "geograph") {
       layout.xaxis = {
         ...commonAxisStyle,
-        title: { text: xAxis, font: { size: 13, color: "rgba(255, 255, 255, 1)" } },
+        title: {
+          text: xAxis,
+          font: { size: 13, color: "rgba(255, 255, 255, 1)" },
+        },
         showgrid: config.showGrid,
-        automargin: true,
       }
       layout.yaxis = {
         ...commonAxisStyle,
-        title: { text: yAxis, font: { size: 13, color: "rgba(255, 255, 255, 1)" } },
+        title: {
+          text: yAxis,
+          font: { size: 13, color: "rgba(255, 255, 255, 1)" },
+        },
         showgrid: config.showGrid,
-        autorange: true,
-        rangemode: "tozero",
-        type: "linear",
-        automargin: true,
       }
     }
 
     let data: any[] = []
 
-    const curveColor = "rgba(255, 255, 255, 0.9)"
-
-    const xs = chartData.map((d) => d[xAxis])
-    const ysRaw = chartData.map((d) => Number(d[yAxis]))
-    const ys = ysRaw.map((v) => (Number.isFinite(v) ? v : null)).filter((v) => v !== null) as number[]
-    const xyValid = chartData.map((d) => [d[xAxis], Number(d[yAxis])] as const).filter(([, y]) => Number.isFinite(y))
+    // Define curve color - using white for the line
+    const curveColor = "rgba(255, 255, 255, 0.9)" // White color for the curve
 
     switch (plotType) {
       case "line":
         data = [
           {
-            x: xyValid.map(([x]) => x),
-            y: xyValid.map(([, y]) => y),
+            x: chartData.map((d) => d[xAxis]),
+            y: chartData.map((d) => d[yAxis]),
             type: "scatter",
             mode: "lines+markers",
             name: `${yAxis}`,
-            line: { color: curveColor, width: config.strokeWidth, shape: config.curveType },
+            line: {
+              color: curveColor, // Using white color
+              width: config.strokeWidth,
+              shape: config.curveType,
+            },
             marker: {
-              color: curveColor,
+              color: curveColor, // Using white color
               size: config.markerSize,
               opacity: config.opacity,
-              line: { color: "rgba(255,255,255,1)", width: 1 },
+              line: { color: "rgba(255, 255, 255, 1)", width: 1 },
             },
             hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
           },
@@ -358,11 +361,15 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
       case "bar":
         data = [
           {
-            x: xyValid.map(([x]) => x),
-            y: xyValid.map(([, y]) => y),
+            x: chartData.map((d) => d[xAxis]),
+            y: chartData.map((d) => d[yAxis]),
             type: "bar",
             name: `${yAxis}`,
-            marker: { color: curveColor, opacity: config.opacity, line: { color: "rgba(255,255,255,0.8)", width: 1 } },
+            marker: {
+              color: curveColor, // Using white color
+              opacity: config.opacity,
+              line: { color: "rgba(255, 255, 255, 0.8)", width: 1 },
+            },
             hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
           },
         ]
@@ -371,14 +378,18 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
       case "area":
         data = [
           {
-            x: xyValid.map(([x]) => x),
-            y: xyValid.map(([, y]) => y),
+            x: chartData.map((d) => d[xAxis]),
+            y: chartData.map((d) => d[yAxis]),
             fill: "tozeroy",
             type: "scatter",
             mode: "lines",
             name: `${yAxis}`,
-            line: { color: curveColor, width: config.strokeWidth, shape: config.curveType },
-            fillcolor: "rgba(255, 255, 255, 0.3)",
+            line: {
+              color: curveColor, // Using white color
+              width: config.strokeWidth,
+              shape: config.curveType,
+            },
+            fillcolor: "rgba(255, 255, 255, 0.3)", // Light white fill
             hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
           },
         ]
@@ -387,16 +398,16 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
       case "scatter":
         data = [
           {
-            x: xyValid.map(([x]) => x),
-            y: xyValid.map(([, y]) => y),
+            x: chartData.map((d) => d[xAxis]),
+            y: chartData.map((d) => d[yAxis]),
             mode: "markers",
             type: "scatter",
             name: `${yAxis}`,
             marker: {
-              color: curveColor,
+              color: curveColor, // Using white color
               size: config.markerSize + 2,
               opacity: config.opacity,
-              line: { color: "rgba(255,255,255,1)", width: 1 },
+              line: { color: "rgba(255, 255, 255, 1)", width: 1 },
             },
             hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
           },
@@ -445,12 +456,12 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
             theta: radarData.map((d) => String(d[xAxis])),
             fill: "toself",
             name: yAxis,
-            line: { color: curveColor, width: config.strokeWidth },
+            line: { color: curveColor, width: config.strokeWidth }, // Using white color
             marker: {
               color: curveColor,
               size: config.markerSize,
               opacity: config.opacity,
-            },
+            }, // Using white color
             hovertemplate: `<b>%{theta}</b><br>${yAxis}: %{r}<extra></extra>`,
           },
         ]
@@ -489,7 +500,7 @@ const CSVVisualizationDashboard: React.FC<Props> = ({ csvFile = DEFAULT_CSV, ini
               lon: validGeoData.map((d) => d[geoColumns.lon!]),
               mode: "markers",
               marker: {
-                color: curveColor,
+                color: curveColor, // Using white color
                 size: config.markerSize + 4,
                 opacity: config.opacity,
               },
