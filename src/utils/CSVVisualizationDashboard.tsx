@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 "use client";
 
 import type React from "react";
 import { useRef, useState, useMemo, useEffect } from "react";
-=======
-"use client"
-
-import type React from "react"
-import { useRef, useState, useMemo, useEffect } from "react"
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 import {
   Download,
   BarChart3,
@@ -25,16 +18,10 @@ import {
   RefreshCw,
   Map,
   ZoomOut,
-<<<<<<< HEAD
   X,
 } from "lucide-react";
 import Papa from "papaparse";
 import * as Plotly from "plotly.js-dist-min";
-=======
-} from "lucide-react"
-import Papa from "papaparse"
-import * as Plotly from "plotly.js-dist-min"
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
 const CHART_COLORS = [
   "hsl(var(--chart-1))", // Primary Blue
@@ -45,11 +32,7 @@ const CHART_COLORS = [
   "hsl(var(--chart-6))", // Green
   "hsl(var(--chart-7))", // Orange
   "hsl(var(--chart-8))", // Light Blue
-<<<<<<< HEAD
 ];
-=======
-]
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
 const CHART_TYPES = [
   { value: "line", label: "Line", icon: LineChartIcon },
@@ -59,7 +42,6 @@ const CHART_TYPES = [
   { value: "pie", label: "Pie", icon: PieChartIcon },
   { value: "radar", label: "Radar", icon: Activity },
   { value: "geograph", label: "Geography", icon: Map },
-<<<<<<< HEAD
 ];
 
 interface ChartConfig {
@@ -86,53 +68,71 @@ const CSVVisualizationDashboard: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
-=======
-]
-
-interface ChartConfig {
-  showGrid: boolean
-  showLegend: boolean
-  strokeWidth: number
-  opacity: number
-  animationDuration: number
-  curveType: "spline" | "linear" | "hv" | "vh"
-  colorScale: string
-  markerSize: number
-  hoverMode: "closest" | "x" | "y" | false
-}
-
-const CSVVisualizationDashboard: React.FC = () => {
-  const chartRef = useRef<HTMLDivElement>(null)
-  const plotlyRef = useRef<any>(null)
-  const [plotType, setPlotType] = useState("line")
-  const [csvData, setCsvData] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [xAxis, setXAxis] = useState("")
-  const [yAxis, setYAxis] = useState("")
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
-  const [isZoomedIn, setIsZoomedIn] = useState(false)
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
   const [config, setConfig] = useState<ChartConfig>({
     showGrid: true,
     showLegend: true,
     strokeWidth: 2,
     opacity: 0.85,
-<<<<<<< HEAD
     animationDuration: 600,
-=======
-    animationDuration: 300, // Reduced animation duration for less animation
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
     curveType: "spline",
     colorScale: "viridis",
     markerSize: 6,
     hoverMode: "closest",
-<<<<<<< HEAD
   });
 
+  // Helper function to detect date columns
+  const isDateColumn = (columnName: string, sampleValues: any[]) => {
+    const lowerName = columnName.toLowerCase();
+    
+    // Check if column name suggests it's a date
+    const dateKeywords = ['date', 'time', 'created', 'updated', 'timestamp'];
+    const hasDateKeyword = dateKeywords.some(keyword => lowerName.includes(keyword));
+    
+    if (hasDateKeyword) return true;
+    
+    // Check if sample values look like dates
+    const validDateCount = sampleValues.slice(0, 5).filter(value => {
+      if (!value || typeof value !== 'string') return false;
+      
+      // Common date patterns
+      const datePatterns = [
+        /^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/, // dd-mm-yyyy or dd/mm/yyyy
+        /^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/, // yyyy-mm-dd or yyyy/mm/dd
+        /^\d{1,2}[-/]\d{1,2}[-/]\d{2}$/, // dd-mm-yy or dd/mm/yy
+      ];
+      
+      return datePatterns.some(pattern => pattern.test(value));
+    }).length;
+    
+    // If more than half of sample values look like dates, consider it a date column
+    return validDateCount >= Math.ceil(sampleValues.slice(0, 5).length / 2);
+  };
+
+  // Date parsing function
+  const parseDate = (dateStr: any) => {
+    if (!dateStr || typeof dateStr !== 'string') return null;
+    
+    // Handle dd-mm-yyyy format
+    const ddmmyyyy = dateStr.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    if (ddmmyyyy) {
+      const [, day, month, year] = ddmmyyyy;
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)); // month is 0-indexed in JS Date
+    }
+    
+    // Handle yyyy-mm-dd format
+    const yyyymmdd = dateStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (yyyymmdd) {
+      const [, year, month, day] = yyyymmdd;
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    // Fallback to native Date parsing
+    const parsed = new Date(dateStr);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   // Function to sample data if it exceeds 2000 points
-  const sampleData = (data: any[], maxPoints = 2000) => {
+  const sampleData = (data: any[], maxPoints = 5000) => {
     if (data.length <= maxPoints) return data;
     const step = Math.floor(data.length / maxPoints);
     const sampledData = [];
@@ -141,47 +141,21 @@ const CSVVisualizationDashboard: React.FC = () => {
     }
     return sampledData.slice(0, maxPoints);
   };
-=======
-  })
-
-  // Function to sample data if it exceeds 2000 points
-  const sampleData = (data: any[], maxPoints = 2000) => {
-    if (data.length <= maxPoints) return data
-    const step = Math.floor(data.length / maxPoints)
-    const sampledData = []
-    for (let i = 0; i < data.length; i += step) {
-      sampledData.push(data[i])
-    }
-    return sampledData.slice(0, maxPoints)
-  }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
   // Function to fetch CSV data
   const fetchCSVData = async () => {
     try {
-<<<<<<< HEAD
       setLoading(true);
       setError(null);
 
       const response = await fetch(
-        "https://anantha-kwml.onrender.com/static/plots/userId_chatId_uniqueId.csv"
+        "http://localhost:8000/static/plots/userId_chatId_uniqueId.csv"
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const csvText = await response.text();
-=======
-      setLoading(true)
-      setError(null)
-
-      const response = await fetch("https://anantha-kwml.onrender.com/static/plots/userId_chatId_uniqueId.csv")
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const csvText = await response.text()
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
       return new Promise<any[]>((resolve, reject) => {
         Papa.parse(csvText, {
@@ -191,7 +165,6 @@ const CSVVisualizationDashboard: React.FC = () => {
           transformHeader: (header) => header.trim(),
           complete: (results) => {
             if (results.errors.length > 0) {
-<<<<<<< HEAD
               console.warn("CSV parsing warnings:", results.errors);
             }
             resolve(results.data as any[]);
@@ -206,48 +179,51 @@ const CSVVisualizationDashboard: React.FC = () => {
       throw error;
     }
   };
-=======
-              console.warn("CSV parsing warnings:", results.errors)
-            }
-            resolve(results.data as any[])
-          },
-          error: (error) => {
-            reject(error)
-          },
-        })
-      })
-    } catch (error) {
-      console.error("Error fetching CSV data:", error)
-      throw error
-    }
-  }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
   // Load CSV data on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
-<<<<<<< HEAD
         const data = await fetchCSVData();
         const sampledData = sampleData(data);
         setCsvData(sampledData);
 
         if (sampledData.length > 0) {
-          const numericCols = Object.keys(sampledData[0]).filter((key) => {
+          const allColumns = Object.keys(sampledData[0] || {});
+          const sampleValues = (col: string) => sampledData.slice(0, 10).map(row => row[col]).filter(v => v != null);
+          
+          // Find first plottable column for x-axis
+          const firstPlottableCol = allColumns.find(key => {
+            const samples = sampleValues(key);
+            if (samples.length === 0) return false;
+            
+            // Check if it's a date or numeric column
+            if (isDateColumn(key, samples)) return true;
+            
             const value = sampledData[0][key];
-            return (
-              typeof value === "number" ||
-              (!isNaN(Number.parseFloat(value)) && isFinite(value))
-            );
+            return typeof value === "number" || (!isNaN(Number.parseFloat(value)) && isFinite(value));
+          });
+          
+          // Find second plottable column for y-axis
+          const secondPlottableCol = allColumns.find(key => {
+            if (key === firstPlottableCol) return false;
+            const samples = sampleValues(key);
+            if (samples.length === 0) return false;
+            
+            // Check if it's a date or numeric column
+            if (isDateColumn(key, samples)) return true;
+            
+            const value = sampledData[0][key];
+            return typeof value === "number" || (!isNaN(Number.parseFloat(value)) && isFinite(value));
           });
 
-          if (numericCols.length > 0 && !xAxis) {
-            setXAxis(numericCols[0]);
+          if (firstPlottableCol && !xAxis) {
+            setXAxis(firstPlottableCol);
           }
-          if (numericCols.length > 1 && !yAxis) {
-            setYAxis(numericCols[1]);
-          } else if (numericCols.length === 1 && !yAxis) {
-            setYAxis(numericCols[0]);
+          if (secondPlottableCol && !yAxis) {
+            setYAxis(secondPlottableCol);
+          } else if (firstPlottableCol && !yAxis && !secondPlottableCol) {
+            setYAxis(firstPlottableCol);
           }
         }
       } catch (err) {
@@ -261,55 +237,59 @@ const CSVVisualizationDashboard: React.FC = () => {
 
     loadData();
   }, []);
-=======
-        const data = await fetchCSVData()
-        const sampledData = sampleData(data)
-        setCsvData(sampledData)
 
-        if (sampledData.length > 0) {
-          const numericCols = Object.keys(sampledData[0]).filter((key) => {
-            const value = sampledData[0][key]
-            return typeof value === "number" || (!isNaN(Number.parseFloat(value)) && isFinite(value))
-          })
+  // Enhanced column detection
+  const { numericColumns, dateColumns, allPlottableColumns } = useMemo(() => {
+    if (csvData.length === 0) return { numericColumns: [], dateColumns: [], allPlottableColumns: [] };
+    
+    const allColumns = Object.keys(csvData[0] || {});
+    const numeric: string[] = [];
+    const dates: string[] = [];
+    
+    allColumns.forEach(key => {
+      const sampleValues = csvData.slice(0, 10).map(row => row[key]).filter(v => v != null);
+      
+      if (sampleValues.length === 0) return;
+      
+      // Check if it's a date column
+      if (isDateColumn(key, sampleValues)) {
+        dates.push(key);
+      } else {
+        // Check if it's numeric
+        const value = csvData[0][key];
+        if (typeof value === "number" || (!isNaN(Number.parseFloat(value)) && isFinite(value))) {
+          numeric.push(key);
+        }
+      }
+    });
+    
+    const allPlottable = [...numeric, ...dates];
+    
+    return { 
+      numericColumns: numeric, 
+      dateColumns: dates, 
+      allPlottableColumns: allPlottable 
+    };
+  }, [csvData]);
 
-          if (numericCols.length > 0 && !xAxis) {
-            setXAxis(numericCols[0])
-          }
-          if (numericCols.length > 1 && !yAxis) {
-            setYAxis(numericCols[1])
-          } else if (numericCols.length === 1 && !yAxis) {
-            setYAxis(numericCols[0])
+  // Updated chart data processing to handle dates
+  const chartData = useMemo(() => {
+    return csvData.map((row, index) => {
+      const processedRow = { ...row, index: index + 1 };
+      
+      // Convert date columns to proper Date objects for plotting
+      dateColumns.forEach(col => {
+        if (processedRow[col]) {
+          const parsedDate = parseDate(processedRow[col]);
+          if (parsedDate) {
+            processedRow[col] = parsedDate;
           }
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load CSV data")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadData()
-  }, [])
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
-
-  const chartData = useMemo(() => {
-    return csvData.map((row, index) => ({
-      ...row,
-      index: index + 1,
-<<<<<<< HEAD
-    }));
-  }, [csvData]);
-
-  const numericColumns = useMemo(() => {
-    if (csvData.length === 0) return [];
-    return Object.keys(csvData[0] || {}).filter((key) => {
-      const value = csvData[0][key];
-      return (
-        typeof value === "number" ||
-        (!isNaN(Number.parseFloat(value)) && isFinite(value))
-      );
+      });
+      
+      return processedRow;
     });
-  }, [csvData]);
+  }, [csvData, dateColumns]);
 
   const geoColumns = useMemo(() => {
     if (csvData.length === 0) return { lat: null, lon: null };
@@ -320,31 +300,11 @@ const CSVVisualizationDashboard: React.FC = () => {
         col.toLowerCase().includes("latitude") ||
         col.toLowerCase() === "y"
     );
-=======
-    }))
-  }, [csvData])
-
-  const numericColumns = useMemo(() => {
-    if (csvData.length === 0) return []
-    return Object.keys(csvData[0] || {}).filter((key) => {
-      const value = csvData[0][key]
-      return typeof value === "number" || (!isNaN(Number.parseFloat(value)) && isFinite(value))
-    })
-  }, [csvData])
-
-  const geoColumns = useMemo(() => {
-    if (csvData.length === 0) return { lat: null, lon: null }
-    const columns = Object.keys(csvData[0] || {})
-    const latCol = columns.find(
-      (col) => col.toLowerCase().includes("lat") || col.toLowerCase().includes("latitude") || col.toLowerCase() === "y",
-    )
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
     const lonCol = columns.find(
       (col) =>
         col.toLowerCase().includes("lon") ||
         col.toLowerCase().includes("lng") ||
         col.toLowerCase().includes("longitude") ||
-<<<<<<< HEAD
         col.toLowerCase() === "x"
     );
     return { lat: latCol || null, lon: lonCol || null };
@@ -352,15 +312,6 @@ const CSVVisualizationDashboard: React.FC = () => {
 
   const handleDownload = async () => {
     if (!plotlyRef.current) return;
-=======
-        col.toLowerCase() === "x",
-    )
-    return { lat: latCol || null, lon: lonCol || null }
-  }, [csvData])
-
-  const handleDownload = async () => {
-    if (!plotlyRef.current) return
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
     try {
       await Plotly.downloadImage(plotlyRef.current, {
@@ -369,7 +320,6 @@ const CSVVisualizationDashboard: React.FC = () => {
         height: 900,
         filename: `chart-${plotType}-${Date.now()}`,
         scale: 2,
-<<<<<<< HEAD
       });
     } catch (error) {
       console.error("Error downloading chart:", error);
@@ -403,48 +353,12 @@ const CSVVisualizationDashboard: React.FC = () => {
         setLoading(false);
       });
   };
-=======
-      })
-    } catch (error) {
-      console.error("Error downloading chart:", error)
-      // Fallback method
-      try {
-        const canvas = plotlyRef.current.querySelector("canvas")
-        if (canvas) {
-          const link = document.createElement("a")
-          link.download = `chart-${plotType}-${Date.now()}.png`
-          link.href = canvas.toDataURL()
-          link.click()
-        }
-      } catch (fallbackError) {
-        console.error("Fallback download also failed:", fallbackError)
-      }
-    }
-  }
-
-  const handleRefresh = () => {
-    setLoading(true)
-    fetchCSVData()
-      .then((data) => {
-        const sampledData = sampleData(data)
-        setCsvData(sampledData)
-        setError(null)
-      })
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : "Failed to refresh data")
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
   const handleZoomOut = () => {
     if (plotlyRef.current) {
       Plotly.relayout(plotlyRef.current, {
         "xaxis.autorange": true,
         "yaxis.autorange": true,
-<<<<<<< HEAD
       });
       setIsZoomedIn(false);
     }
@@ -453,22 +367,11 @@ const CSVVisualizationDashboard: React.FC = () => {
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
-=======
-      })
-      setIsZoomedIn(false)
-    }
-  }
-
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
-  }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
   useEffect(() => {
     if (chartRef.current && chartData.length > 0) {
       if (plotType === "geograph") {
         if (geoColumns.lat && geoColumns.lon) {
-<<<<<<< HEAD
           renderPlotlyChart();
         }
       } else if (xAxis && yAxis) {
@@ -479,29 +382,54 @@ const CSVVisualizationDashboard: React.FC = () => {
 
   const renderPlotlyChart = () => {
     if (!chartRef.current) return;
-=======
-          renderPlotlyChart()
-        }
-      } else if (xAxis && yAxis) {
-        renderPlotlyChart()
-      }
-    }
-  }, [plotType, chartData, xAxis, yAxis, config, isFullscreen])
-
-  const renderPlotlyChart = () => {
-    if (!chartRef.current) return
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
     const plotlyConfig = {
       responsive: true,
       displayModeBar: false,
       displaylogo: false,
       scrollZoom: true,
-<<<<<<< HEAD
     };
-=======
-    }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
+
+    // Process data to handle multiple points per date/x-value
+    const processChartData = () => {
+      if (plotType === "scatter" || plotType === "line") {
+        // For scatter and line plots, show all individual points
+        return chartData;
+      } else if (plotType === "bar" && dateColumns.includes(xAxis)) {
+        // For bar charts with dates, aggregate by date and calculate average
+        const grouped = chartData.reduce((acc, row) => {
+          const xVal = row[xAxis];
+          const yVal = Number(row[yAxis]) || 0;
+          
+          let key;
+          if (xVal instanceof Date) {
+            key = xVal.toDateString(); // Group by date string
+          } else {
+            key = String(xVal);
+          }
+          
+          if (!acc[key]) {
+            acc[key] = { xValue: xVal, yValues: [], count: 0 };
+          }
+          acc[key].yValues.push(yVal);
+          acc[key].count += 1;
+          return acc;
+        }, {} as Record<string, { xValue: any, yValues: number[], count: number }>);
+
+        // Calculate averages for each group
+        return Object.values(grouped).map(group => ({
+          [xAxis]: group.xValue,
+          [yAxis]: group.yValues.reduce((sum, val) => sum + val, 0) / group.count,
+          count: group.count,
+          min: Math.min(...group.yValues),
+          max: Math.max(...group.yValues)
+        }));
+      } else {
+        return chartData;
+      }
+    };
+
+    const processedData = processChartData();
 
     // Updated axis styling with light colors for dark theme
     const commonAxisStyle = {
@@ -512,11 +440,7 @@ const CSVVisualizationDashboard: React.FC = () => {
       linewidth: 1,
       tickfont: { size: 11, color: "rgba(255, 255, 255, 0.8)" },
       titlefont: { size: 13, color: "rgba(255, 255, 255, 1)" },
-<<<<<<< HEAD
     };
-=======
-    }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
     const layout: any = {
       plot_bgcolor: "hsl(210, 100%, 5%)",
@@ -543,11 +467,7 @@ const CSVVisualizationDashboard: React.FC = () => {
         easing: "cubic-in-out",
       },
       hovermode: config.hoverMode,
-<<<<<<< HEAD
     };
-=======
-    }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
     // Configure axes for all non-geographic chart types
     if (plotType !== "pie" && plotType !== "geograph") {
@@ -558,11 +478,7 @@ const CSVVisualizationDashboard: React.FC = () => {
           font: { size: 13, color: "rgba(255, 255, 255, 1)" },
         },
         showgrid: config.showGrid,
-<<<<<<< HEAD
       };
-=======
-      }
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
       layout.yaxis = {
         ...commonAxisStyle,
         title: {
@@ -570,7 +486,6 @@ const CSVVisualizationDashboard: React.FC = () => {
           font: { size: 13, color: "rgba(255, 255, 255, 1)" },
         },
         showgrid: config.showGrid,
-<<<<<<< HEAD
       };
     }
 
@@ -578,22 +493,13 @@ const CSVVisualizationDashboard: React.FC = () => {
 
     // Define curve color - using white for the line
     const curveColor = "rgba(255, 255, 255, 0.9)"; // White color for the curve
-=======
-      }
-    }
-
-    let data: any[] = []
-
-    // Define curve color - using white for the line
-    const curveColor = "rgba(255, 255, 255, 0.9)" // White color for the curve
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
     switch (plotType) {
       case "line":
         data = [
           {
-            x: chartData.map((d) => d[xAxis]),
-            y: chartData.map((d) => d[yAxis]),
+            x: processedData.map((d) => d[xAxis]),
+            y: processedData.map((d) => d[yAxis]),
             type: "scatter",
             mode: "lines+markers",
             name: `${yAxis}`,
@@ -608,43 +514,39 @@ const CSVVisualizationDashboard: React.FC = () => {
               opacity: config.opacity,
               line: { color: "rgba(255, 255, 255, 1)", width: 1 },
             },
-            hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
+            hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y:.2f}<extra></extra>`,
           },
-<<<<<<< HEAD
         ];
         break;
-=======
-        ]
-        break
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
       case "bar":
+        const isDateXAxis = dateColumns.includes(xAxis);
+        const hoverTemplate = isDateXAxis 
+          ? `<b>%{x}</b><br>Average ${yAxis}: %{y:.2f}<br>Data points: %{customdata}<extra></extra>`
+          : `<b>%{x}</b><br>${yAxis}: %{y:.2f}<extra></extra>`;
+
         data = [
           {
-            x: chartData.map((d) => d[xAxis]),
-            y: chartData.map((d) => d[yAxis]),
+            x: processedData.map((d) => d[xAxis]),
+            y: processedData.map((d) => d[yAxis]),
             type: "bar",
-            name: `${yAxis}`,
+            name: isDateXAxis ? `Average ${yAxis}` : yAxis,
             marker: {
               color: curveColor, // Using white color
               opacity: config.opacity,
               line: { color: "rgba(255, 255, 255, 0.8)", width: 1 },
             },
-            hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
+            customdata: processedData.map((d) => d.count || 1),
+            hovertemplate: hoverTemplate,
           },
-<<<<<<< HEAD
         ];
         break;
-=======
-        ]
-        break
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
       case "area":
         data = [
           {
-            x: chartData.map((d) => d[xAxis]),
-            y: chartData.map((d) => d[yAxis]),
+            x: processedData.map((d) => d[xAxis]),
+            y: processedData.map((d) => d[yAxis]),
             fill: "tozeroy",
             type: "scatter",
             mode: "lines",
@@ -655,21 +557,16 @@ const CSVVisualizationDashboard: React.FC = () => {
               shape: config.curveType,
             },
             fillcolor: "rgba(255, 255, 255, 0.3)", // Light white fill
-            hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
+            hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y:.2f}<extra></extra>`,
           },
-<<<<<<< HEAD
         ];
         break;
-=======
-        ]
-        break
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
       case "scatter":
         data = [
           {
-            x: chartData.map((d) => d[xAxis]),
-            y: chartData.map((d) => d[yAxis]),
+            x: processedData.map((d) => d[xAxis]),
+            y: processedData.map((d) => d[yAxis]),
             mode: "markers",
             type: "scatter",
             name: `${yAxis}`,
@@ -679,14 +576,13 @@ const CSVVisualizationDashboard: React.FC = () => {
               opacity: config.opacity,
               line: { color: "rgba(255, 255, 255, 1)", width: 1 },
             },
-            hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y}<extra></extra>`,
+            hovertemplate: `<b>%{x}</b><br>${yAxis}: %{y:.2f}<extra></extra>`,
           },
-<<<<<<< HEAD
         ];
         break;
 
       case "pie":
-        const pieData = chartData.reduce((acc, d) => {
+        const pieData = processedData.reduce((acc, d) => {
           const label = String(d[xAxis]);
           const value = Number(d[yAxis]) || 0;
           if (acc[label]) {
@@ -698,27 +594,6 @@ const CSVVisualizationDashboard: React.FC = () => {
         }, {} as Record<string, number>);
 
         const pieEntries = Object.entries(pieData).slice(0, 8);
-=======
-        ]
-        break
-
-      case "pie":
-        const pieData = chartData.reduce(
-          (acc, d) => {
-            const label = String(d[xAxis])
-            const value = Number(d[yAxis]) || 0
-            if (acc[label]) {
-              acc[label] += value
-            } else {
-              acc[label] = value
-            }
-            return acc
-          },
-          {} as Record<string, number>,
-        )
-
-        const pieEntries = Object.entries(pieData).slice(0, 8)
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
         data = [
           {
@@ -732,21 +607,12 @@ const CSVVisualizationDashboard: React.FC = () => {
             insidetextfont: { color: "rgba(0, 0, 0, 0.9)" },
             outsidetextfont: { color: "rgba(255, 255, 255, 0.9)" },
           },
-<<<<<<< HEAD
         ];
         layout.margin = { l: 20, r: 20, t: 40, b: 20 };
         break;
 
       case "radar":
-        const radarData = chartData.slice(0, 6);
-=======
-        ]
-        layout.margin = { l: 20, r: 20, t: 40, b: 20 }
-        break
-
-      case "radar":
-        const radarData = chartData.slice(0, 6)
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
+        const radarData = processedData.slice(0, 6);
         data = [
           {
             type: "scatterpolar",
@@ -760,13 +626,9 @@ const CSVVisualizationDashboard: React.FC = () => {
               size: config.markerSize,
               opacity: config.opacity,
             }, // Using white color
-            hovertemplate: `<b>%{theta}</b><br>${yAxis}: %{r}<extra></extra>`,
+            hovertemplate: `<b>%{theta}</b><br>${yAxis}: %{r:.2f}<extra></extra>`,
           },
-<<<<<<< HEAD
         ];
-=======
-        ]
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
         layout.polar = {
           bgcolor: "hsl(210, 100%, 5%)",
           radialaxis: {
@@ -782,13 +644,8 @@ const CSVVisualizationDashboard: React.FC = () => {
             linecolor: "rgba(255, 255, 255, 0.6)",
             linewidth: 1,
           },
-<<<<<<< HEAD
         };
         break;
-=======
-        }
-        break
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
       case "geograph":
         if (geoColumns.lat && geoColumns.lon) {
@@ -797,13 +654,8 @@ const CSVVisualizationDashboard: React.FC = () => {
               d[geoColumns.lat!] != null &&
               d[geoColumns.lon!] != null &&
               !isNaN(d[geoColumns.lat!]) &&
-<<<<<<< HEAD
               !isNaN(d[geoColumns.lon!])
           );
-=======
-              !isNaN(d[geoColumns.lon!]),
-          )
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
           data = [
             {
@@ -818,7 +670,6 @@ const CSVVisualizationDashboard: React.FC = () => {
               },
               text: validGeoData.map((d) => {
                 const info = Object.keys(d)
-<<<<<<< HEAD
                   .filter(
                     (key) => key !== geoColumns.lat && key !== geoColumns.lon
                   )
@@ -850,52 +701,22 @@ const CSVVisualizationDashboard: React.FC = () => {
               : maxRange < 50
               ? 3
               : 2;
-=======
-                  .filter((key) => key !== geoColumns.lat && key !== geoColumns.lon)
-                  .map((key) => `${key}: ${d[key]}`)
-                  .join("<br>")
-                return `Lat: ${d[geoColumns.lat!]}<br>Lon: ${d[geoColumns.lon!]}<br>${info}`
-              }),
-              hovertemplate: "%{text}<extra></extra>",
-            },
-          ]
-
-          const lats = validGeoData.map((d) => d[geoColumns.lat!])
-          const lons = validGeoData.map((d) => d[geoColumns.lon!])
-          const centerLat = lats.reduce((a, b) => a + b, 0) / lats.length
-          const centerLon = lons.reduce((a, b) => a + b, 0) / lons.length
-
-          const latRange = Math.max(...lats) - Math.min(...lats)
-          const lonRange = Math.max(...lons) - Math.min(...lons)
-          const maxRange = Math.max(latRange, lonRange)
-          const zoom = maxRange < 1 ? 8 : maxRange < 5 ? 6 : maxRange < 20 ? 4 : maxRange < 50 ? 3 : 2
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
 
           layout.mapbox = {
             style: "carto-darkmatter",
             center: { lat: centerLat, lon: centerLon },
             zoom: zoom,
             accesstoken: "YOUR_MAPBOX_ACCESS_TOKEN",
-<<<<<<< HEAD
           };
 
           delete layout.xaxis;
           delete layout.yaxis;
         }
         break;
-=======
-          }
-
-          delete layout.xaxis
-          delete layout.yaxis
-        }
-        break
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
     }
 
     const onUpdate = (figure: any) => {
       if (figure.layout?.xaxis?.range || figure.layout?.yaxis?.range) {
-<<<<<<< HEAD
         setIsZoomedIn(true);
       } else {
         setIsZoomedIn(false);
@@ -913,71 +734,37 @@ const CSVVisualizationDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="w-full max-w-7xl mx-auto p-6 bg-background min-h-screen">
-=======
-        setIsZoomedIn(true)
-      } else {
-        setIsZoomedIn(false)
-      }
-    }
-
-    Plotly.newPlot(chartRef.current, data, layout, plotlyConfig).then((plot) => {
-      plotlyRef.current = plot
-      plot.on("plotly_relayout", onUpdate)
-    })
-  }
-
-  if (loading) {
-    return (
-      <div className="w-full max-w-7xl mx-auto p-4 md:p-6 bg-background min-h-screen">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
         <div className="bg-card border border-border rounded-xl shadow-[var(--shadow-elegant)] p-8 text-center">
           <div className="space-y-6">
             <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center bg-primary text-primary-foreground">
               <Loader2 className="h-10 w-10 animate-spin" />
             </div>
             <div>
-<<<<<<< HEAD
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Loading CSV Data
               </h3>
               <p className="text-muted-foreground text-sm">
                 Fetching sample sales data from CSV file
               </p>
-=======
-              <h3 className="text-xl font-semibold text-foreground mb-2">Loading CSV Data</h3>
-              <p className="text-muted-foreground text-sm">Fetching sample sales data from CSV file</p>
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
             </div>
           </div>
         </div>
       </div>
-<<<<<<< HEAD
     );
-=======
-    )
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
   }
 
   if (error) {
     return (
-<<<<<<< HEAD
       <div className="w-full max-w-7xl mx-auto p-6 bg-background min-h-screen">
-=======
-      <div className="w-full max-w-7xl mx-auto p-4 md:p-6 bg-background min-h-screen">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
         <div className="bg-card border border-destructive/30 rounded-xl shadow-[var(--shadow-elegant)] p-8 text-center">
           <div className="space-y-6">
             <div className="w-20 h-20 mx-auto rounded-full bg-destructive/20 flex items-center justify-center border border-destructive/30">
               <Activity className="h-10 w-10 text-destructive" />
             </div>
             <div>
-<<<<<<< HEAD
               <h3 className="text-xl font-semibold text-destructive mb-2">
                 Data Loading Error
               </h3>
-=======
-              <h3 className="text-xl font-semibold text-destructive mb-2">Data Loading Error</h3>
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
               <p className="text-destructive/80 mb-4">{error}</p>
               <button
                 onClick={handleRefresh}
@@ -990,37 +777,24 @@ const CSVVisualizationDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-<<<<<<< HEAD
     );
-=======
-    )
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
   }
 
   if (!csvData || csvData.length === 0) {
     return (
-<<<<<<< HEAD
       <div className="w-full max-w-7xl mx-auto p-6 bg-background min-h-screen">
-=======
-      <div className="w-full max-w-7xl mx-auto p-4 md:p-6 bg-background min-h-screen">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
         <div className="bg-card border border-border rounded-xl shadow-[var(--shadow-elegant)] p-8 text-center">
           <div className="space-y-6">
             <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center bg-warning text-warning-foreground">
               <BarChart3 className="h-10 w-10" />
             </div>
             <div>
-<<<<<<< HEAD
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 No Data Available
               </h3>
               <p className="text-muted-foreground mb-4">
                 The CSV file appears to be empty or contains no valid data
               </p>
-=======
-              <h3 className="text-xl font-semibold text-foreground mb-2">No Data Available</h3>
-              <p className="text-muted-foreground mb-4">The CSV file appears to be empty or contains no valid data</p>
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
               <button
                 onClick={handleRefresh}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-[var(--shadow-card)]"
@@ -1032,44 +806,29 @@ const CSVVisualizationDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-<<<<<<< HEAD
     );
-=======
-    )
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
   }
 
-  if (numericColumns.length === 0 && plotType !== "geograph") {
+  if (allPlottableColumns.length === 0 && plotType !== "geograph") {
     return (
-<<<<<<< HEAD
       <div className="w-full max-w-7xl mx-auto p-6 bg-background min-h-screen">
-=======
-      <div className="w-full max-w-7xl mx-auto p-4 md:p-6 bg-background min-h-screen">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
         <div className="bg-card border border-warning/30 rounded-xl shadow-[var(--shadow-elegant)] p-8 text-center">
           <div className="space-y-6">
             <div className="w-20 h-20 mx-auto rounded-full bg-warning/20 flex items-center justify-center border border-warning/30">
               <Activity className="h-10 w-10 text-warning" />
             </div>
             <div>
-<<<<<<< HEAD
               <h3 className="text-xl font-semibold text-warning mb-2">
-                No Numeric Data Found
+                No Plottable Data Found
               </h3>
               <p className="text-warning/80 mb-4">
-                The CSV data doesn't contain numeric columns suitable for
+                The CSV data doesn't contain numeric or date columns suitable for
                 plotting
               </p>
               <div className="mt-6 p-4 rounded-lg text-left max-w-md mx-auto bg-muted border border-border">
                 <p className="text-sm mb-3 text-foreground font-medium">
                   Available columns:
                 </p>
-=======
-              <h3 className="text-xl font-semibold text-warning mb-2">No Numeric Data Found</h3>
-              <p className="text-warning/80 mb-4">The CSV data doesn't contain numeric columns suitable for plotting</p>
-              <div className="mt-6 p-4 rounded-lg text-left max-w-md mx-auto bg-muted border border-border">
-                <p className="text-sm mb-3 text-foreground font-medium">Available columns:</p>
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                 <ul className="text-sm space-y-1">
                   {Object.keys(csvData[0] || {}).map((col) => (
                     <li key={col} className="font-mono text-muted-foreground">
@@ -1082,16 +841,11 @@ const CSVVisualizationDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-<<<<<<< HEAD
     );
-=======
-    )
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
   }
 
   return (
     <div
-<<<<<<< HEAD
       className={`w-full mx-auto space-y-6 bg-background min-h-screen font-[var(--font-body)] transition-all duration-300 ${
         isFullscreen
           ? "fixed inset-0 z-50 p-4 overflow-auto max-w-none"
@@ -1121,51 +875,19 @@ const CSVVisualizationDashboard: React.FC = () => {
                 title="Zoom Out"
               >
                 <ZoomOut className="h-4 w-4" />
-=======
-      className={`w-full mx-auto space-y-4 md:space-y-6 bg-background min-h-screen font-[var(--font-body)] transition-all duration-200 ${
-        isFullscreen ? "fixed inset-0 z-50 p-3 md:p-4 overflow-auto max-w-none" : "max-w-7xl p-3 md:p-6"
-      }`}
-    >
-      <div className="bg-card border border-border rounded-xl shadow-[var(--shadow-elegant)] p-4 md:p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 md:gap-4">
-          <div className="space-y-1 md:space-y-2">
-            <h1 className="text-lg md:text-2xl font-bold text-primary">CSV Data Visualization</h1>
-            <p className="text-muted-foreground text-xs md:text-sm">
-              Interactive {plotType.charAt(0).toUpperCase() + plotType.slice(1)} chart • {yAxis || "Geographic"} vs{" "}
-              {xAxis || "Location"} • {csvData.length.toLocaleString()} data points
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1.5 md:gap-2 p-1.5 md:p-2 bg-secondary rounded-lg border border-border">
-            {isZoomedIn && (
-              <button
-                onClick={handleZoomOut}
-                className="p-2 md:p-2.5 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground transition-all duration-150 border border-border"
-                title="Zoom Out"
-              >
-                <ZoomOut className="h-3.5 w-3.5 md:h-4 md:w-4" />
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
               </button>
             )}
 
             <button
               onClick={handleRefresh}
-<<<<<<< HEAD
               className="p-2 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground transition-all duration-200 border border-border"
               title="Refresh"
             >
               <RefreshCw className="h-4 w-4" />
-=======
-              className="p-2 md:p-2.5 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground transition-all duration-150 border border-border"
-              title="Refresh"
-            >
-              <RefreshCw className="h-3.5 w-3.5 md:h-4 md:w-4" />
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
             </button>
 
             <button
               onClick={toggleFullscreen}
-<<<<<<< HEAD
               className="p-2 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground transition-all duration-200 border border-border"
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
             >
@@ -1173,98 +895,55 @@ const CSVVisualizationDashboard: React.FC = () => {
                 <Minimize2 className="h-4 w-4" />
               ) : (
                 <Maximize2 className="h-4 w-4" />
-=======
-              className="p-2 md:p-2.5 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground transition-all duration-150 border border-border"
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-            >
-              {isFullscreen ? (
-                <Minimize2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
-              ) : (
-                <Maximize2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
               )}
             </button>
 
             <button
               onClick={handleDownload}
-<<<<<<< HEAD
               className="p-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 shadow-[var(--shadow-card)]"
               title="Download"
             >
               <Download className="h-4 w-4" />
-=======
-              className="p-2 md:p-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-150 shadow-[var(--shadow-card)]"
-              title="Download"
-            >
-              <Download className="h-3.5 w-3.5 md:h-4 md:w-4" />
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
             </button>
 
             <button
               onClick={() => setShowSettings(!showSettings)}
-<<<<<<< HEAD
               className={`p-2 rounded-lg transition-all duration-200 border ${
-=======
-              className={`p-2 md:p-2.5 rounded-lg transition-all duration-150 border ${
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                 showSettings
                   ? "bg-primary text-primary-foreground border-primary/30"
                   : "bg-accent hover:bg-accent-hover text-accent-foreground border-border"
               }`}
               title="Settings"
             >
-<<<<<<< HEAD
               <Settings className="h-4 w-4" />
-=======
-              <Settings className="h-3.5 w-3.5 md:h-4 md:w-4" />
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
             </button>
           </div>
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* Main Chart Card */}
       <div className="bg-card border border-border rounded-xl shadow-[var(--shadow-elegant)] overflow-hidden">
         <div className="p-6 space-y-6">
           {/* Chart Type Selection */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2">
-=======
-      <div className="bg-card border border-border rounded-xl shadow-[var(--shadow-elegant)] overflow-hidden">
-        <div className="p-3 md:p-6 space-y-4 md:space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-2 md:gap-4">
-            <div className="flex flex-wrap gap-1.5 md:gap-2">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
               {CHART_TYPES.map(({ value, label, icon: Icon }) => (
                 <button
                   key={value}
                   onClick={() => setPlotType(value)}
-<<<<<<< HEAD
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-=======
-                  className={`inline-flex items-center gap-1.5 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-150 ${
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                     plotType === value
                       ? "bg-primary text-primary-foreground shadow-[var(--shadow-card)] border border-primary/30"
                       : "bg-secondary hover:bg-secondary-hover text-secondary-foreground border border-border"
                   }`}
-<<<<<<< HEAD
                 >
                   <Icon className="h-4 w-4" />
                   {label}
-=======
-                  title={label}
-                >
-                  <Icon className="h-3.5 w-3.5 md:h-4 md:w-4 flex-shrink-0" />
-                  <span className="hidden md:inline">{label}</span>
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                 </button>
               ))}
             </div>
           </div>
 
-<<<<<<< HEAD
           {/* Axis Configuration */}
           {plotType !== "geograph" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1276,27 +955,16 @@ const CSVVisualizationDashboard: React.FC = () => {
                   value={xAxis}
                   onChange={(e) => setXAxis(e.target.value)}
                   className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-=======
-          {plotType !== "geograph" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-              <div className="space-y-1.5 md:space-y-2">
-                <label className="block text-xs md:text-sm font-medium text-foreground">X-Axis</label>
-                <select
-                  value={xAxis}
-                  onChange={(e) => setXAxis(e.target.value)}
-                  className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                 >
                   <option value="index">Index</option>
-                  {numericColumns.map((col) => (
+                  {allPlottableColumns.map((col) => (
                     <option key={col} value={col}>
-                      {col}
+                      {col} {dateColumns.includes(col) ? '(Date)' : '(Numeric)'}
                     </option>
                   ))}
                 </select>
               </div>
 
-<<<<<<< HEAD
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-foreground">
                   Y-Axis
@@ -1305,18 +973,10 @@ const CSVVisualizationDashboard: React.FC = () => {
                   value={yAxis}
                   onChange={(e) => setYAxis(e.target.value)}
                   className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-=======
-              <div className="space-y-1.5 md:space-y-2">
-                <label className="block text-xs md:text-sm font-medium text-foreground">Y-Axis</label>
-                <select
-                  value={yAxis}
-                  onChange={(e) => setYAxis(e.target.value)}
-                  className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                 >
-                  {numericColumns.map((col) => (
+                  {allPlottableColumns.map((col) => (
                     <option key={col} value={col}>
-                      {col}
+                      {col} {dateColumns.includes(col) ? '(Date)' : '(Numeric)'}
                     </option>
                   ))}
                 </select>
@@ -1324,7 +984,6 @@ const CSVVisualizationDashboard: React.FC = () => {
             </div>
           )}
 
-<<<<<<< HEAD
           {/* Advanced Settings Panel */}
           {showSettings && (
             <div className="space-y-8 p-6 rounded-xl bg-secondary/50 border border-border backdrop-blur-sm">
@@ -1342,23 +1001,6 @@ const CSVVisualizationDashboard: React.FC = () => {
                     <div className="space-y-3">
                       <label className="flex items-center justify-between p-3 rounded-lg bg-card border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                         <div className="flex items-center gap-3">
-=======
-          {showSettings && (
-            <div className="space-y-4 md:space-y-8 p-3 md:p-6 rounded-xl bg-secondary/50 border border-border backdrop-blur-sm">
-              <div className="space-y-4 md:space-y-6">
-                <h3 className="text-base md:text-lg font-semibold text-foreground border-b border-border pb-2">
-                  Chart Configuration
-                </h3>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                  <div className="space-y-3 md:space-y-4">
-                    <h4 className="text-xs md:text-sm font-medium text-foreground/80 uppercase tracking-wider">
-                      Display Options
-                    </h4>
-                    <div className="space-y-2 md:space-y-3">
-                      <label className="flex items-center justify-between p-2.5 md:p-3 rounded-lg bg-card border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-                        <div className="flex items-center gap-2 md:gap-3">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                           <input
                             type="checkbox"
                             checked={config.showGrid}
@@ -1370,7 +1012,6 @@ const CSVVisualizationDashboard: React.FC = () => {
                             }
                             className="rounded border-border bg-input text-primary focus:ring-primary/50"
                           />
-<<<<<<< HEAD
                           <span className="text-sm font-medium text-foreground">
                             Show Grid Lines
                           </span>
@@ -1379,14 +1020,6 @@ const CSVVisualizationDashboard: React.FC = () => {
 
                       <label className="flex items-center justify-between p-3 rounded-lg bg-card border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                         <div className="flex items-center gap-3">
-=======
-                          <span className="text-xs md:text-sm font-medium text-foreground">Show Grid Lines</span>
-                        </div>
-                      </label>
-
-                      <label className="flex items-center justify-between p-2.5 md:p-3 rounded-lg bg-card border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-                        <div className="flex items-center gap-2 md:gap-3">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                           <input
                             type="checkbox"
                             checked={config.showLegend}
@@ -1398,19 +1031,14 @@ const CSVVisualizationDashboard: React.FC = () => {
                             }
                             className="rounded border-border bg-input text-primary focus:ring-primary/50"
                           />
-<<<<<<< HEAD
                           <span className="text-sm font-medium text-foreground">
                             Show Legend
                           </span>
-=======
-                          <span className="text-xs md:text-sm font-medium text-foreground">Show Legend</span>
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                         </div>
                       </label>
                     </div>
                   </div>
 
-<<<<<<< HEAD
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium text-foreground/80 uppercase tracking-wider">
                       Styling Controls
@@ -1422,17 +1050,6 @@ const CSVVisualizationDashboard: React.FC = () => {
                             Stroke Width
                           </span>
                           <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-=======
-                  <div className="space-y-3 md:space-y-4">
-                    <h4 className="text-xs md:text-sm font-medium text-foreground/80 uppercase tracking-wider">
-                      Styling Controls
-                    </h4>
-                    <div className="space-y-3 md:space-y-4">
-                      <div className="p-2.5 md:p-3 rounded-lg bg-card border border-border">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs md:text-sm font-medium text-foreground">Stroke Width</span>
-                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 md:py-1 rounded">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                             {config.strokeWidth}px
                           </span>
                         </div>
@@ -1452,19 +1069,12 @@ const CSVVisualizationDashboard: React.FC = () => {
                         />
                       </div>
 
-<<<<<<< HEAD
                       <div className="p-3 rounded-lg bg-card border border-border">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-foreground">
                             Opacity
                           </span>
                           <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-=======
-                      <div className="p-2.5 md:p-3 rounded-lg bg-card border border-border">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs md:text-sm font-medium text-foreground">Opacity</span>
-                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 md:py-1 rounded">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                             {Math.round(config.opacity * 100)}%
                           </span>
                         </div>
@@ -1484,19 +1094,12 @@ const CSVVisualizationDashboard: React.FC = () => {
                         />
                       </div>
 
-<<<<<<< HEAD
                       <div className="p-3 rounded-lg bg-card border border-border">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-foreground">
                             Marker Size
                           </span>
                           <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-=======
-                      <div className="p-2.5 md:p-3 rounded-lg bg-card border border-border">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs md:text-sm font-medium text-foreground">Marker Size</span>
-                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 md:py-1 rounded">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                             {config.markerSize}px
                           </span>
                         </div>
@@ -1519,7 +1122,6 @@ const CSVVisualizationDashboard: React.FC = () => {
                   </div>
                 </div>
 
-<<<<<<< HEAD
                 {/* Advanced Options */}
                 <div className="space-y-4">
                   <h4 className="text-sm font-medium text-foreground/80 uppercase tracking-wider">
@@ -1544,24 +1146,6 @@ const CSVVisualizationDashboard: React.FC = () => {
                           }))
                         }
                         className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring"
-=======
-                <div className="space-y-3 md:space-y-4">
-                  <h4 className="text-xs md:text-sm font-medium text-foreground/80 uppercase tracking-wider">
-                    Advanced Options
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                    <div className="space-y-1.5 md:space-y-2">
-                      <label className="block text-xs md:text-sm font-medium text-foreground">Hover Mode</label>
-                      <select
-                        value={config.hoverMode === false ? "off" : config.hoverMode}
-                        onChange={(e) =>
-                          setConfig((prev) => ({
-                            ...prev,
-                            hoverMode: e.target.value === "off" ? false : (e.target.value as any),
-                          }))
-                        }
-                        className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring"
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                       >
                         <option value="closest">Closest Point</option>
                         <option value="x">X-Axis</option>
@@ -1571,15 +1155,10 @@ const CSVVisualizationDashboard: React.FC = () => {
                     </div>
 
                     {(plotType === "line" || plotType === "area") && (
-<<<<<<< HEAD
                       <div className="space-y-2">
                         <label className="block text-sm font-medium text-foreground">
                           Curve Type
                         </label>
-=======
-                      <div className="space-y-1.5 md:space-y-2">
-                        <label className="block text-xs md:text-sm font-medium text-foreground">Curve Type</label>
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                         <select
                           value={config.curveType}
                           onChange={(e) =>
@@ -1588,11 +1167,7 @@ const CSVVisualizationDashboard: React.FC = () => {
                               curveType: e.target.value as any,
                             }))
                           }
-<<<<<<< HEAD
                           className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring"
-=======
-                          className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring"
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                         >
                           <option value="spline">Smooth Curve</option>
                           <option value="linear">Linear</option>
@@ -1605,7 +1180,6 @@ const CSVVisualizationDashboard: React.FC = () => {
                 </div>
               </div>
 
-<<<<<<< HEAD
               {plotType === "geograph" &&
                 (!geoColumns.lat || !geoColumns.lon) && (
                   <div className="p-4 rounded-lg border-l-4 border-warning bg-warning/10 border border-warning/20">
@@ -1645,41 +1219,6 @@ const CSVVisualizationDashboard: React.FC = () => {
                 <div className="text-center space-y-2">
                   <BarChart3 className="h-12 w-12 mx-auto opacity-50" />
                   <p className="text-sm">
-=======
-              {plotType === "geograph" && (!geoColumns.lat || !geoColumns.lon) && (
-                <div className="p-3 md:p-4 rounded-lg border-l-4 border-warning bg-warning/10 border border-warning/20">
-                  <div className="space-y-2">
-                    <p className="text-xs md:text-sm text-warning font-medium">
-                      Geographic visualization requires latitude and longitude columns.
-                    </p>
-                    <p className="text-xs text-warning/80">
-                      Looking for columns named: lat/latitude/y and lon/lng/longitude/x
-                    </p>
-                    {csvData.length > 0 && (
-                      <p className="text-xs text-muted-foreground">
-                        Available columns: {Object.keys(csvData[0]).join(", ")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div
-            ref={chartRef}
-            className={`w-full rounded-xl border-2 border-border bg-muted/20 overflow-hidden ${
-              isFullscreen ? "h-[calc(100vh-16rem)] md:h-[calc(100vh-20rem)]" : "h-80 md:h-96 lg:h-[600px]"
-            }`}
-          >
-            {(xAxis && yAxis) || (plotType === "geograph" && geoColumns.lat && geoColumns.lon) ? (
-              <div className="w-full h-full" />
-            ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                <div className="text-center space-y-2 px-4">
-                  <BarChart3 className="h-10 w-10 md:h-12 md:w-12 mx-auto opacity-50" />
-                  <p className="text-xs md:text-sm">
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                     {plotType === "geograph"
                       ? "Geographic data not available - need latitude and longitude columns"
                       : "Please select both X and Y axes to display the chart"}
@@ -1689,7 +1228,6 @@ const CSVVisualizationDashboard: React.FC = () => {
             )}
           </div>
 
-<<<<<<< HEAD
           {/* Data Summary */}
           <div className="flex flex-wrap items-center gap-6 text-sm border-t border-border pt-4 text-muted-foreground">
             <div className="flex items-center gap-2">
@@ -1703,6 +1241,12 @@ const CSVVisualizationDashboard: React.FC = () => {
               <BarChart3 className="h-4 w-4 text-chart-3" />
               <span>{numericColumns.length} numeric columns</span>
             </div>
+            {dateColumns.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-chart-2" />
+                <span>{dateColumns.length} date columns</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-success" />
               <span>Live CSV data</span>
@@ -1710,26 +1254,6 @@ const CSVVisualizationDashboard: React.FC = () => {
             {plotType === "geograph" && geoColumns.lat && geoColumns.lon && (
               <div className="flex items-center gap-2">
                 <Map className="h-4 w-4 text-chart-2" />
-=======
-          <div className="flex flex-wrap items-center gap-3 md:gap-6 text-xs md:text-sm border-t border-border pt-3 md:pt-4 text-muted-foreground">
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <TrendingUp className="h-3.5 w-3.5 md:h-4 md:w-4 text-chart-1 flex-shrink-0" />
-              <span>
-                {csvData.length.toLocaleString()} data points {csvData.length >= 2000 ? "(sampled)" : ""}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <BarChart3 className="h-3.5 w-3.5 md:h-4 md:w-4 text-chart-3 flex-shrink-0" />
-              <span>{numericColumns.length} numeric columns</span>
-            </div>
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <Activity className="h-3.5 w-3.5 md:h-4 md:w-4 text-success flex-shrink-0" />
-              <span>Live CSV data</span>
-            </div>
-            {plotType === "geograph" && geoColumns.lat && geoColumns.lon && (
-              <div className="flex items-center gap-1.5 md:gap-2">
-                <Map className="h-3.5 w-3.5 md:h-4 md:w-4 text-chart-2 flex-shrink-0" />
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
                 <span>Geographic data available</span>
               </div>
             )}
@@ -1737,14 +1261,7 @@ const CSVVisualizationDashboard: React.FC = () => {
         </div>
       </div>
     </div>
-<<<<<<< HEAD
   );
 };
 
 export default CSVVisualizationDashboard;
-=======
-  )
-}
-
-export default CSVVisualizationDashboard
->>>>>>> 49bc9a66db639f24d99e8906802fc2146e890d81
