@@ -5,7 +5,6 @@ import React, {
   useState,
   useEffect,
   useCallback,
-  useMemo,
 } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,13 +13,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import CSVVisualizationDashboard from "../utils/CSVVisualizationDashboard";
-import type { Message, Chat, MessageContent, ApiResponse } from "@/types";
+import type { Message, Chat, MessageContent } from "@/types";
 import {
   LineChart,
   Table,
   BookOpenText,
   MessageCircle,
-  Waves,
   Search,
   Plus,
   ArrowUp,
@@ -33,12 +31,9 @@ import {
   MoreHorizontal,
   Sparkles,
   Database,
-  TrendingUp,
-  Zap,
   Globe,
   BarChart3,
   Activity,
-  Languages,
   Image as ImageIcon,
   X,
   Paperclip,
@@ -51,6 +46,8 @@ import {
   Lightbulb,
   Star,
   Check,
+  Mic,
+  MicOff,
 } from "lucide-react";
 import {
   Tooltip,
@@ -74,7 +71,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -176,11 +172,10 @@ Tone & style:
 
       const data = await response.json();
       return (
-        data.candidates?.[0]?.content?.parts?.find((p) => p.text)?.text || ""
+        data.candidates?.[0]?.content?.parts?.find((p: any) => p.text)?.text || ""
       );
     } else {
       // For non-image files, we'll use a text-based approach
-      // Note: This is a simplified version - in production you'd want proper file parsing
       const response = await fetch(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
         {
@@ -217,7 +212,7 @@ Tone & style:
 
       const data = await response.json();
       return (
-        data.candidates?.[0]?.content?.parts?.find((p) => p.text)?.text ||
+        data.candidates?.[0]?.content?.parts?.find((p: any) => p.text)?.text ||
         `Analysis of ${fileName} (${mimeType}): This file type contains data that can be analyzed for oceanographic insights.`
       );
     }
@@ -282,7 +277,7 @@ function ChatSidebar({
       <SidebarContent className="p-4">
         <Button
           variant="default"
-          className="mb-6 w-full bg-primary text-primary-foreground hover:bg-primary-hover transition-colors duration-200 font-semibold shadow-elegant"
+          className="mb-6 w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 font-semibold shadow-lg"
           onClick={onNewChat}
         >
           <Plus className="size-4 mr-2" />
@@ -300,9 +295,9 @@ function ChatSidebar({
                 <div
                   key={chat.id}
                   className={cn(
-                    "group flex items-center gap-2 rounded-lg p-3 transition-colors duration-200",
+                    "group flex items-center gap-2 rounded-lg p-3 transition-all duration-200",
                     activeChat === chat.id
-                      ? "bg-accent border border-accent"
+                      ? "bg-accent border border-accent shadow-md"
                       : "hover:bg-secondary"
                   )}
                 >
@@ -337,7 +332,7 @@ function ChatSidebar({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="bg-card border-border text-foreground"
+                      className="bg-card border-border text-foreground z-[100]"
                     >
                       <DropdownMenuItem
                         onClick={() => onDeleteChat(chat.id)}
@@ -435,8 +430,8 @@ function MessageBubble({
           : "Thank you for helping us with this intimation.",
       description:
         vote === "up"
-          ? "This positive rating helps us reinforce the chatbot's current response patterns. Your input strengthens the underlying reinforcement learning model, making it more likely to generate similar high-quality answers in future conversations.\n\nEvery response you give matters — it helps make our system smarter and better for you."
-          : "This negative rating signals our reinforcement learning system to adjust its weights and reduce the likelihood of generating similar responses again. Over time, your feedback helps fine-tune the model toward more accurate and contextually relevant answers.\n\nEvery response you give matters — it helps make our system smarter and better for you.",
+          ? "This positive rating helps us reinforce the chatbot's current response patterns."
+          : "This negative rating signals our system to adjust its weights and reduce the likelihood of generating similar responses.",
     });
   };
 
@@ -495,7 +490,6 @@ function MessageBubble({
       }
 
       // Table content
-      // TABLE rendering
       if (content.type === "table" && content.tableData) {
         return (
           <div className="space-y-6">
@@ -535,16 +529,14 @@ function MessageBubble({
 
             {content.explanation && (
               <div className="bg-card rounded-lg p-4 border border-border">
-                <div className="text-sm text-foreground">
-                  {content.explanation}
-                </div>
+                <div className="text-sm text-foreground">{content.explanation}</div>
               </div>
             )}
 
             {content.csvDownload && (
               <Button
                 variant="outline"
-                className="border-border text-foreground hover:bg-secondary transition-colors duration-200"
+                className="border-border text-foreground hover:bg-secondary transition-all duration-200"
                 onClick={() => {
                   const link = document.createElement("a");
                   link.href =
@@ -563,7 +555,6 @@ function MessageBubble({
 
       // PLOT rendering
       if (content.type === "plot") {
-        // Case 1: csvUrl is empty → show explanation only
         if (!content.csvUrl) {
           return (
             <div className="bg-card rounded-lg p-4 border border-border">
@@ -574,7 +565,6 @@ function MessageBubble({
           );
         }
 
-        // Case 2: csvUrl exists → show plot + download
         return (
           <div className="space-y-4">
             <CSVVisualizationDashboard
@@ -584,7 +574,7 @@ function MessageBubble({
 
             <Button
               variant="outline"
-              className="border-border text-foreground hover:bg-secondary"
+              className="border-border text-foreground hover:bg-secondary transition-all duration-200"
               onClick={() => {
                 const link = document.createElement("a");
                 link.href =
@@ -632,12 +622,10 @@ function MessageBubble({
       {isAssistant ? (
         <div className="group flex w-full flex-col gap-3">
           <div className="flex items-center gap-3">
-            <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
+            <div className="size-8 rounded-lg bg-primary flex items-center justify-center shadow-lg">
               <Activity className="size-4 text-primary-foreground" />
             </div>
-            <div className="text-sm font-medium text-foreground">
-              Anantha AI
-            </div>
+            <div className="text-sm font-medium text-foreground">Anantha AI</div>
             <Badge
               variant="secondary"
               className="text-xs bg-secondary text-foreground"
@@ -676,9 +664,9 @@ function MessageBubble({
                     variant={isUpvoted ? "default" : "ghost"}
                     size="icon"
                     className={cn(
-                      "size-8 rounded-full",
+                      "size-8 rounded-full transition-all duration-200",
                       isUpvoted
-                        ? "bg-success hover:bg-success text-foreground"
+                        ? "bg-success hover:bg-success text-foreground shadow-lg"
                         : "hover:bg-secondary text-muted-foreground"
                     )}
                     onClick={() => handleVote("up")}
@@ -694,9 +682,9 @@ function MessageBubble({
                     variant={isDownvoted ? "default" : "ghost"}
                     size="icon"
                     className={cn(
-                      "size-8 rounded-full",
+                      "size-8 rounded-full transition-all duration-200",
                       isDownvoted
-                        ? "bg-destructive hover:bg-destructive text-foreground"
+                        ? "bg-destructive hover:bg-destructive text-foreground shadow-lg"
                         : "hover:bg-secondary text-muted-foreground"
                     )}
                     onClick={() => handleVote("down")}
@@ -722,7 +710,7 @@ function MessageBubble({
                 <Button
                   size="sm"
                   onClick={onSaveEdit}
-                  className="bg-primary text-primary-foreground hover:bg-primary-hover font-medium"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
                 >
                   Save & Regenerate
                 </Button>
@@ -737,10 +725,9 @@ function MessageBubble({
               </div>
             </div>
           ) : (
-            <div className="bg-primary text-primary-foreground rounded-2xl px-5 py-3 max-w-[85%] sm:max-w-[80%] break-words space-y-3">
-              {/* Show uploaded file if it exists */}
+            <div className="bg-primary text-primary-foreground rounded-2xl px-5 py-3 max-w-[85%] sm:max-w-[80%] break-words space-y-3 shadow-lg">
               {message.uploadedFile && (
-                <div className="rounded-lg overflow-hidden bg-primary-hover p-3">
+                <div className="rounded-lg overflow-hidden bg-primary/80 p-3">
                   <div className="flex items-center gap-2">
                     <FileText className="size-4" />
                     <span className="text-sm">{message.fileName}</span>
@@ -805,7 +792,7 @@ function ChatContent({
   const [editingMessage, setEditingMessage] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [votedMessages, setVotedMessages] = useState<{
-    [key: string]: "up" | "down";
+    [key: string]: "up" | "down" | null;
   }>({});
   const [selectedLanguage, setSelectedLanguage] = useState("english");
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -820,6 +807,10 @@ function ChatContent({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("Plot");
+
+  // Voice input state
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   // Settings modal state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -1005,7 +996,7 @@ function ChatContent({
 
       const response = await fetchData(
         userPrompt,
-        normalizedTab, // send theory instead of advanced reasoning
+        normalizedTab,
         language,
         imageData
       );
@@ -1101,10 +1092,8 @@ function ChatContent({
       if (!isIncognito) {
         setMessages((prev) => [...prev, response]);
       } else {
-        // In incognito mode, we still want to show the response but not save it
         setMessages((prev) => {
           const newMessages = [...prev];
-          // Replace the last message (which is the user's incognito message) with the response
           if (
             newMessages.length > 0 &&
             newMessages[newMessages.length - 1].role === "user"
@@ -1128,7 +1117,6 @@ function ChatContent({
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
-      // Clear the uploaded file after sending
       setUploadedFile(null);
       setFilePreview(null);
       if (fileInputRef.current) {
@@ -1201,8 +1189,72 @@ function ChatContent({
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
     };
   }, []);
+
+  // Initialize voice recognition
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = Array.from(event.results)
+            .map((result: any) => result[0])
+            .map((result) => result.transcript)
+            .join("");
+
+          setPrompt(transcript);
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error:", event.error);
+          setIsListening(false);
+          toast({
+            title: "Voice input error",
+            description: "Could not access microphone. Please check permissions.",
+            variant: "destructive",
+          });
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [toast]);
+
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      toast({
+        title: "Voice input not supported",
+        description: "Your browser doesn't support voice input.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   const analysisTypes = [
     {
@@ -1310,8 +1362,8 @@ function ChatContent({
 
   return (
     <main className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-      <header className="bg-card z-10 flex h-16 w-full shrink-0 items-center gap-4 border-b border-border px-6">
-        <SidebarTrigger className="-ml-1 text-foreground hover:bg-secondary transition-colors duration-200" />
+      <header className="bg-card z-10 flex h-16 w-full shrink-0 items-center gap-4 border-b border-border px-6 shadow-sm">
+        <SidebarTrigger className="-ml-1 text-foreground hover:bg-secondary transition-all duration-200 rounded-lg" />
         <div className="flex items-center gap-3 flex-1">
           <div className="text-foreground font-medium">{chatTitle}</div>
           <Badge
@@ -1321,9 +1373,8 @@ function ChatContent({
             {activeTab} Mode
           </Badge>
 
-          {/* Show Incognito badge only if incognito mode is ON */}
           {isIncognito && (
-            <Badge className="text-xs bg-red-500 text-white">Incognito</Badge>
+            <Badge className="text-xs bg-red-500 text-white shadow-lg">Incognito</Badge>
           )}
         </div>
 
@@ -1334,9 +1385,9 @@ function ChatContent({
               <button
                 onClick={toggleIncognito}
                 className={cn(
-                  "p-2 rounded-lg transition-colors duration-200",
+                  "p-2 rounded-lg transition-all duration-200",
                   isIncognito
-                    ? "bg-accent text-accent-foreground"
+                    ? "bg-accent text-accent-foreground shadow-md"
                     : "text-muted-foreground hover:bg-secondary"
                 )}
                 aria-label="Incognito mode"
@@ -1356,7 +1407,7 @@ function ChatContent({
             <TooltipTrigger asChild>
               <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="text-muted-foreground hover:bg-secondary p-2 rounded-lg transition-colors duration-200"
+                className="text-muted-foreground hover:bg-secondary p-2 rounded-lg transition-all duration-200"
                 aria-label="Open preferences"
               >
                 <Settings className="w-5 h-5" />
@@ -1369,10 +1420,10 @@ function ChatContent({
 
       {/* Settings Modal */}
       {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div
             ref={modalRef}
-            className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border"
+            className="bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border"
           >
             <div className="p-6">
               {!showSuccess ? (
@@ -1383,7 +1434,7 @@ function ChatContent({
                     </h2>
                     <button
                       onClick={() => setIsSettingsOpen(false)}
-                      className="text-muted-foreground hover:text-foreground transition-colors duration-200 p-1"
+                      className="text-muted-foreground hover:text-foreground transition-colors duration-200 p-1 hover:bg-secondary rounded-lg"
                     >
                       <X className="w-6 h-6" />
                     </button>
@@ -1404,7 +1455,7 @@ function ChatContent({
                           <SelectTrigger className="w-full bg-background border-border text-foreground">
                             <SelectValue placeholder="Select your role" />
                           </SelectTrigger>
-                          <SelectContent className="bg-card border-border text-foreground">
+                          <SelectContent className="bg-card border-border text-foreground z-[100]">
                             <SelectItem value="Student">Student</SelectItem>
                             <SelectItem value="Working Professional">
                               Working Professional
@@ -1518,16 +1569,16 @@ function ChatContent({
                               key={objective}
                               onClick={() => toggleObjective(objective)}
                               className={cn(
-                                "p-3 rounded-lg border cursor-pointer transition-colors duration-200",
+                                "p-3 rounded-lg border cursor-pointer transition-all duration-200",
                                 objectives.includes(objective)
-                                  ? "bg-primary/20 border-primary text-foreground"
+                                  ? "bg-primary/20 border-primary text-foreground shadow-md"
                                   : "bg-background border-border text-foreground hover:bg-secondary"
                               )}
                             >
                               <div className="flex items-center gap-3">
                                 <div
                                   className={cn(
-                                    "size-5 rounded border flex items-center justify-center flex-shrink-0",
+                                    "size-5 rounded border flex items-center justify-center flex-shrink-0 transition-all duration-200",
                                     objectives.includes(objective)
                                       ? "bg-primary border-primary"
                                       : "border-border"
@@ -1604,7 +1655,7 @@ function ChatContent({
                   <div className="flex justify-end pt-6 border-t border-border mt-6">
                     <Button
                       onClick={applyPreferences}
-                      className="bg-primary hover:bg-primary-hover text-primary-foreground px-6 py-2 rounded-lg transition-colors duration-200 font-medium"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg transition-all duration-200 font-medium shadow-lg"
                     >
                       Apply Preferences
                     </Button>
@@ -1647,7 +1698,8 @@ function ChatContent({
                 {analysisTypes.map((type) => (
                   <Card
                     key={type.id}
-                    className="p-4 hover:border-primary transition-colors duration-200 cursor-pointer bg-card border-border glass-effect"
+                    className="p-4 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer bg-card border-border glass-effect"
+                    onClick={() => setActiveTab(type.id)}
                   >
                     <div className="text-center space-y-3">
                       <div className="size-12 rounded-xl bg-accent flex items-center justify-center mx-auto">
@@ -1687,7 +1739,7 @@ function ChatContent({
           {isLoading && (
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 mb-8 px-4 sm:px-6 items-start">
               <div className="flex items-center gap-3">
-                <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
+                <div className="size-8 rounded-lg bg-primary flex items-center justify-center shadow-lg">
                   <Activity className="size-4 text-primary-foreground" />
                 </div>
                 <div className="flex items-center gap-2">
@@ -1715,7 +1767,7 @@ function ChatContent({
 
       <div className="bg-background z-10 shrink-0 p-4 md:p-6">
         <div className="mx-auto max-w-6xl">
-          <Card className="relative border border-border p-0 bg-background shadow-elegant">
+          <Card className="relative border border-border p-0 bg-background shadow-lg">
             <CardContent className="p-0">
               <div className="flex flex-col">
                 {/* File Preview */}
@@ -1739,7 +1791,7 @@ function ChatContent({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-6 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive"
+                          className="size-6 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           onClick={removeFile}
                         >
                           <X className="size-3" />
@@ -1788,14 +1840,14 @@ function ChatContent({
                           <Button
                             variant="outline"
                             size="icon"
-                            className="rounded-xl text-muted-foreground border-border hover:bg-secondary transition-colors duration-200"
+                            className="rounded-xl text-muted-foreground border-border hover:bg-secondary transition-all duration-200"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isLoading}
                           >
                             <Paperclip className="size-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent className="z-[100]">
                           Upload file (images, PDF, Excel, etc.)
                         </TooltipContent>
                       </Tooltip>
@@ -1819,19 +1871,19 @@ function ChatContent({
                                   activeTab === type.id ? "default" : "outline"
                                 }
                                 className={cn(
-                                  "rounded-xl transition-colors duration-200 font-medium whitespace-nowrap",
+                                  "rounded-xl transition-all duration-200 font-medium whitespace-nowrap",
                                   activeTab === type.id
-                                    ? "bg-primary text-primary-foreground"
+                                    ? "bg-primary text-primary-foreground shadow-lg"
                                     : "text-muted-foreground border-border hover:bg-secondary"
                                 )}
                                 disabled={isLoading}
                                 onClick={() => setActiveTab(type.id)}
                               >
-                                <type.icon size={16} className="mr-2" />
-                                <span>{type.label}</span>
+                                <type.icon size={16} className="md:mr-2" />
+                                <span className="hidden md:inline">{type.label}</span>
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="bg-card text-foreground border-border">
+                            <TooltipContent className="bg-card text-foreground border-border z-[100]">
                               <div className="text-center">
                                 <div className="font-medium">{type.label}</div>
                                 <div className="text-xs text-muted-foreground">
@@ -1852,7 +1904,7 @@ function ChatContent({
                         <Globe className="size-4 mr-2" />
                         <SelectValue placeholder="Language" />
                       </SelectTrigger>
-                      <SelectContent className="bg-card border-border text-foreground">
+                      <SelectContent className="bg-card border-border text-foreground z-[100]">
                         {languages.map((lang) => (
                           <SelectItem
                             key={lang.value}
@@ -1868,12 +1920,36 @@ function ChatContent({
 
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={toggleVoiceInput}
+                            disabled={isLoading}
+                            className={cn(
+                              "size-10 rounded-xl transition-all duration-200",
+                              isListening
+                                ? "bg-red-500 text-white border-red-500 hover:bg-red-600 animate-pulse shadow-lg"
+                                : "text-muted-foreground border-border hover:bg-secondary"
+                            )}
+                          >
+                            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="z-[100]">
+                          {isListening ? "Stop voice input" : "Start voice input"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
                       {isLoading ? (
                         <Button
                           variant="outline"
                           size="icon"
                           onClick={handleStopGeneration}
-                          className="size-10 rounded-xl text-muted-foreground border-border hover:bg-secondary"
+                          className="size-10 rounded-xl text-muted-foreground border-border hover:bg-secondary transition-all duration-200"
                         >
                           <StopCircle size={18} />
                         </Button>
@@ -1884,7 +1960,7 @@ function ChatContent({
                             (!prompt.trim() && !uploadedFile) || isLoading
                           }
                           onClick={() => handleSubmit()}
-                          className="size-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover transition-colors duration-200"
+                          className="size-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
                           <ArrowUp size={18} />
                         </Button>
@@ -2004,7 +2080,7 @@ const Index = () => {
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center space-y-4">
-                  <div className="size-16 rounded-2xl bg-primary mx-auto flex items-center justify-center">
+                  <div className="size-16 rounded-2xl bg-primary mx-auto flex items-center justify-center shadow-lg">
                     <Sparkles className="size-8 text-primary-foreground" />
                   </div>
                   <div className="text-xl font-medium text-muted-foreground">
