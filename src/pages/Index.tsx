@@ -1057,6 +1057,12 @@ function ChatContent({
     const finalPrompt = submitPrompt || prompt.trim();
     if ((!finalPrompt && !uploadedFile) || isLoading) return;
 
+    // Stop voice recognition if it's active
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+
     if (!submitPrompt) {
       setPrompt("");
     }
@@ -1202,7 +1208,7 @@ function ChatContent({
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = true;
+        recognitionRef.current.continuous = false; // Changed from true to false
         recognitionRef.current.interimResults = true;
 
         recognitionRef.current.onresult = (event: any) => {
