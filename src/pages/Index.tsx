@@ -245,10 +245,14 @@ function ChatSidebar({
       <SidebarHeader className="bg-sidebar-background border-b border-sidebar-border">
         <div className="flex items-center justify-between gap-2 p-4">
           <div className="flex items-center gap-3">
-            <div className="relative flex items-center justify-center size-10 rounded-xl bg-primary">
-              <Waves className="absolute left-1.5 top-1.5 size-3 text-primary-foreground" />
-              <Database className="absolute right-1.5 bottom-1.5 size-3 text-primary-foreground" />
+            <div className="relative flex items-center justify-center size-10 rounded-xl">
+              <img
+                src="Ananthalogo.png"
+                alt="Anantha Logo"
+                className="size-8 rounded-lg object-cover"
+              />
             </div>
+
             <div>
               <div className="text-lg font-bold text-foreground tracking-tight">
                 Anantha
@@ -491,6 +495,7 @@ function MessageBubble({
       }
 
       // Table content
+      // TABLE rendering
       if (content.type === "table" && content.tableData) {
         return (
           <div className="space-y-6">
@@ -542,8 +547,9 @@ function MessageBubble({
                 className="border-border text-foreground hover:bg-secondary transition-colors duration-200"
                 onClick={() => {
                   const link = document.createElement("a");
-                  link.href = "https://anantha-kwml.onrender.com/static/tables/userId_chatId_uniqueId.csv"; // put full path to file
-                  link.download = "data.csv"; // name for download
+                  link.href =
+                    "https://anantha-kwml.onrender.com/static/tables/userId_chatId_uniqueId.csv";
+                  link.download = "data.csv";
                   link.click();
                 }}
               >
@@ -555,7 +561,20 @@ function MessageBubble({
         );
       }
 
-      if (content.type === "plot" && content.csvUrl) {
+      // PLOT rendering
+      if (content.type === "plot") {
+        // Case 1: csvUrl is empty → show explanation only
+        if (!content.csvUrl) {
+          return (
+            <div className="bg-card rounded-lg p-4 border border-border">
+              <p className="text-sm text-muted-foreground">
+                {content.explanation || "No plot available."}
+              </p>
+            </div>
+          );
+        }
+
+        // Case 2: csvUrl exists → show plot + download
         return (
           <div className="space-y-4">
             <CSVVisualizationDashboard
@@ -566,10 +585,13 @@ function MessageBubble({
             <Button
               variant="outline"
               className="border-border text-foreground hover:bg-secondary"
-              onClick={() => {const link = document.createElement("a");
-                  link.href = "https://anantha-kwml.onrender.com/static/plots/userId_chatId_uniqueId.csv"; // put full path to file
-                  link.download = "data.csv"; // name for download
-                  link.click();}}
+              onClick={() => {
+                const link = document.createElement("a");
+                link.href =
+                  "https://anantha-kwml.onrender.com/static/plots/userId_chatId_uniqueId.csv";
+                link.download = "data.csv";
+                link.click();
+              }}
             >
               <Database className="size-4 mr-2" />
               Download Plot Data (CSV)
@@ -814,7 +836,10 @@ function ChatContent({
   // Fixed click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
         setIsSettingsOpen(false);
         setShowSuccess(false);
       }
@@ -874,7 +899,7 @@ function ChatContent({
       ".xls",
       ".csv",
       ".txt",
-      ".nc"
+      ".nc",
     ];
 
     const isValidType = supportedTypes.some((type) => {
