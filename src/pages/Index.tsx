@@ -426,12 +426,12 @@ function MessageBubble({
     toast({
       title:
         vote === "up"
-          ? "Thanks for your feedback!"
-          : "Thank you for helping us with this intimation.",
+          ? "Thanks for your like!"
+          : "Your positive feedback is now being fed into our reinforcement learning model, which treats this as a reward signal. This helps the system strengthen useful patterns and deliver even better responses going forward.",
       description:
         vote === "up"
-          ? "This positive rating helps us reinforce the chatbot's current response patterns."
-          : "This negative rating signals our system to adjust its weights and reduce the likelihood of generating similar responses.",
+          ? "Got it, your dislike has been recorded. "
+          : "Our reinforcement learning model treats this as a corrective signal, helping the system adjust its behavior and avoid repeating similar mistakes in future responses",
     });
   };
 
