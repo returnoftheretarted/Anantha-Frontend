@@ -6,7 +6,7 @@ export const fetchData = async (
   language: string,
   imageData?: string   // make optional
 ): Promise<ApiResponse> => {
-  const res = await fetch('http://136.115.88.237:8000/query', {
+  const res = await fetch('https://anantha-kwml.onrender.com/query', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

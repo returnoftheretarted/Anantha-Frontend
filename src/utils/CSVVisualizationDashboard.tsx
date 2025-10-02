@@ -149,7 +149,7 @@ const CSVVisualizationDashboard: React.FC = () => {
       setError(null);
 
       const response = await fetch(
-        "http://136.115.88.237:8000/static/plots/userId_chatId_uniqueId.csv"
+        "https://anantha-kwml.onrender.com/static/plots/userId_chatId_uniqueId.csv"
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
