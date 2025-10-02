@@ -540,7 +540,7 @@ function MessageBubble({
                 onClick={() => {
                   const link = document.createElement("a");
                   link.href =
-                    "http://136.115.88.237:8000//static/tables/userId_chatId_uniqueId.csv";
+                    "http://136.115.88.237:8000/static/tables/userId_chatId_uniqueId.csv";
                   link.download = "data.csv";
                   link.click();
                 }}
@@ -578,7 +578,7 @@ function MessageBubble({
               onClick={() => {
                 const link = document.createElement("a");
                 link.href =
-                  "http://136.115.88.237:8000//static/plots/userId_chatId_uniqueId.csv";
+                  "http://136.115.88.237:8000/static/plots/userId_chatId_uniqueId.csv";
                 link.download = "data.csv";
                 link.click();
               }}
